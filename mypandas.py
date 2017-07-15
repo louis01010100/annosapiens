@@ -21,41 +21,38 @@ import sys
 
 pd.set_option('display.width', 1280)
 
-def analyze(dataFilePath):
-    data = pd.read_csv(
-               dataFilePath, 
-               delimiter ='\t',
-               dtype = {'chromosome' : str},
-               # nrows=1000,
-           )
+def analyze(data):
 
-    # primaryAssemblyGenes = data[
-    #     (data['group_label'] == 'GRCh38.p7-Primary Assembly') & 
-    #     (data['feature_type'] == 'GENE') & 
-    #     (data['chr_stop'] - data['chr_start'] < 100)
-    # ]
+    primaryAssemblyGenes = data[
+        (data['group_label'] == 'GRCh38.p7-Primary Assembly') & 
+        (data['feature_type'] == 'GENE') & 
+        (data['chr_stop'] - data['chr_start'] < 100)
+    ]
 
-    print(data.groupby('#tax_id').size())
-
-    # print(
-    #     primaryAssemblyGenes[ [
-    #                 'chromosome', 
-    #                 'chr_start', 
-    #                 'chr_stop', 
-    #                 'feature_name', 
-    #                 'feature_type', 
-    #                 'group_label', 
-    #             ]
-    #         ]
-    # )
+    print(
+        primaryAssemblyGenes[ [
+                    'chromosome', 
+                    'chr_start', 
+                    'chr_stop', 
+                    'feature_name', 
+                    'feature_type', 
+                    'group_label', 
+                ]
+            ]
+    )
 
 def load(rawFilePath):
 
     return pd.read_csv(
                rawFilePath, 
                sep = '\t',
-               header = 1,
+               dtype = {'chromosome' : str},
            )
+
+def loadPickled(pickle):
+    return pd.read_pickle(pickle)
+
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
@@ -63,9 +60,9 @@ if __name__ == '__main__':
         sys.exit(1)
 
     # data = load(sys.argv[1])
-    # data.to_pickle('seqgene_md.pickle')
+    # data.to_pickle('data/seqgene_md.pickle')
 
-    # data = load(sys.argv[1])
+    data = loadPickled(sys.argv[1])
 
-    analyze(sys.argv[1])
+    analyze(data)
 
