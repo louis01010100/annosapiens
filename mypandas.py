@@ -25,30 +25,47 @@ def analyze(dataFilePath):
     data = pd.read_csv(
                dataFilePath, 
                delimiter ='\t',
-               nrows=1000,
+               dtype = {'chromosome' : str},
+               # nrows=1000,
            )
 
-    primaryAssemblyGenes = data[
-        (data['group_label'] == 'GRCh38.p7-Primary Assembly') & 
-        (data['feature_type'] == 'GENE')
-    ]
+    # primaryAssemblyGenes = data[
+    #     (data['group_label'] == 'GRCh38.p7-Primary Assembly') & 
+    #     (data['feature_type'] == 'GENE') & 
+    #     (data['chr_stop'] - data['chr_start'] < 100)
+    # ]
 
-    print(
-        primaryAssemblyGenes[ [
-                    'chromosome', 
-                    'chr_start', 
-                    'chr_stop', 
-                    'feature_name', 
-                    'feature_type', 
-                    'group_label', 
-                ]
-            ].head(10)
-    )
+    print(data.groupby('#tax_id').size())
+
+    # print(
+    #     primaryAssemblyGenes[ [
+    #                 'chromosome', 
+    #                 'chr_start', 
+    #                 'chr_stop', 
+    #                 'feature_name', 
+    #                 'feature_type', 
+    #                 'group_label', 
+    #             ]
+    #         ]
+    # )
+
+def load(rawFilePath):
+
+    return pd.read_csv(
+               rawFilePath, 
+               sep = '\t',
+               header = 1,
+           )
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("Usage {cmd} file.cvs".format(cmd=sys.argv[0]))
         sys.exit(1)
+
+    # data = load(sys.argv[1])
+    # data.to_pickle('seqgene_md.pickle')
+
+    # data = load(sys.argv[1])
 
     analyze(sys.argv[1])
 
