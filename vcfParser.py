@@ -7,7 +7,8 @@ def parse(filename):
     vcfReader = vcf.Reader(filename=filename)
 
     for record in vcfReader:
-        print(record)
+        print(record.genotype)
+        
 
 
 
