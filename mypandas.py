@@ -19,7 +19,7 @@
 import pandas as pd
 import sys
 
-pd.set_option('display.width', 1280)
+pd.set_option('display.width', 160) # default 80
 
 def analyze(data):
 
@@ -41,28 +41,63 @@ def analyze(data):
             ]
     )
 
-def load(rawFilePath):
+# def load(rawFilePath):
+#
+#     return pd.read_csv(
+#                rawFilePath, 
+#                sep = '\t',
+#                dtype = {'chromosome' : str},
+#            )
+#
 
-    return pd.read_csv(
-               rawFilePath, 
-               sep = '\t',
-               dtype = {'chromosome' : str},
-           )
-
-def loadPickled(pickle):
+def load(pickle):
     return pd.read_pickle(pickle)
 
 
 
+seq_gene_md_dst = 'data/seq_gene_md.pickle'
+seq_gene_q_dst = 'data/seq_gene_q.pickle'
+
+def sql():
+
+    store = pd.HDFStore('data/store.h5')
+
+    seq_gene_md = store['seq_gene_md'] 
+    seq_gene_q = store['seq_gene_q'] 
+
+   primary_gene_md = seq_gene_md[
+                (seq_gene_md['group_label'] == 'GRCh38.p7-Primary Assembly') & 
+                (seq_gene_md['feature_type'] == 'GENE' )
+            ][ 
+                [ 
+                    'chromosome', 
+                    'chr_start', 
+                    'chr_stop', 
+                    'feature_id', 
+                    'feature_name', 
+                    'feature_type', 
+                    'group_label',
+                ] 
+            ]
+
+    primary_gene_q = seq_gene_q[
+                [ 
+                    '#feature_id', 
+                    'feature_name', 
+                    'alt_symbols', 
+                    'description', 
+                ] 
+            ]
+
+    target = primary_gene_md.merge(primary_gene_q, left_on = 'feature_id', right_on = '#feature_id')
+
+    print(target.head(10))
+    
+
+
+    store.close();
+
+
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("Usage {cmd} file.cvs".format(cmd=sys.argv[0]))
-        sys.exit(1)
-
-    # data = load(sys.argv[1])
-    # data.to_pickle('data/seqgene_md.pickle')
-
-    data = loadPickled(sys.argv[1])
-
-    analyze(data)
-
+    # sql()
+    pd.test()
