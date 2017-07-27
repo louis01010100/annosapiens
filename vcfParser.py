@@ -7,17 +7,17 @@ def analyze(filename):
 
     for record in reader:
 
-        for call in record.samples:
-            if call.is_variant: 
-                print("{chrom}\t{pos}\t{ref}\t{alt}\t{sample}\t{gt}".format(
-                        chrom = record.CHROM,
-                        pos = record.POS,
-                        ref = record.REF,
-                        alt = record.ALT,
-                        sample = call.sample, 
-                        gt = call.gt_bases
-                    )
+        for call in filter(lambda call : call.is_variant, record.samples):
+            print("{chrom}\t{pos}\t{ref}\t{alt}\t{sample}\t{gt}".format(
+                    chrom = record.CHROM,
+                    pos = record.POS,
+                    ref = record.REF,
+                    alt = record.ALT,
+                    sample = call.sample, 
+                    gt = call.gt_bases
                 )
+            )
+
 
 
 
