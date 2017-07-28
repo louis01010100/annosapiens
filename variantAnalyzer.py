@@ -1,31 +1,48 @@
 #!/usr/bin/env python
 
+import csv
 import vcf
-import sys
 
-# NGS20140601A
-def analyze(filename):
-    vcf_reader = vcf.Reader(filename=filename)
+# "chr","pos","ref","alt","ac","clnsig","gene","diseases"
 
-    for record in vcf_reader:
-        maf = {}
-        for key, value in zip(record.ALT, map(lambda x: "{:7.5f}".format(x), record.aaf)):
-            if key :
-                maf[key.sequence] = value
-            else :
-                maf['.'] = value
 
-        print("{}\t{}\t{}\t{}".format(record.CHROM, record.POS, record.REF, maf))
+ANNOTATION_FILE = 'data/biobank_pathogenic.csv'
+BIOBANK_FILE = 'data/grch37/clinvar.vcf.gz'
+
+def to_string(record):
+    return '{chrom}\t{pos}\t{ref}\t{alt}\t{ac}\t{clnsig}\t{gene}\t{diseases}'.format(
+        chrom = chrom,
+        pos = record['pos'],
+        ref = record['ref'],
+        alt = record['alt'],
+        ac = record['ac'],
+        clnsig = record['clnsig'],
+        gene = record['gene'],
+        diseases = record['diseases'],
+    )
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print('Usage: {cmd} foo.vcf'.format(cmd = sys.argv[0]))
-        exit(1)
-    filename = sys.argv[1]
 
-    try: 
-        analyze(filename)
+    vcf_reader = vcf.Reader(filename=BIOBANK_FILE)
+    with open(ANNOTATION_FILE, 'r') as csvfile:
+        reader = csv.DictReader(csvfile)
 
-    except KeyboardInterrupt:
-        exit(1)
+        for row in reader:
+
+            chrom = row['chr'].replace('chr', '');
+
+            # to zero-based, half-open interval
+            start = int(row['pos']) - 1000
+            end = start + len(row['ref']) + 1000
+
+            print('{}\t{}\t{}'.format(row['chr'], start, end))
+
+            # print(to_string(row))
+
+            # for record in vcf_reader.fetch(chrom, start = start, end = end):
+            #     print('{}\t{}'.format(record.POS, record.REF))
+
+
+
+
